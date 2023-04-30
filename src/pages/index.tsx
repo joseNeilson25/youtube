@@ -1,12 +1,9 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
+import { Signin } from "./Signin";
 
 export default function Home() {
   return (
       <main>
-        
+        <Signin/>
       </main>
   )
 }
