@@ -1,12 +1,29 @@
 import { GoogleLogo } from "phosphor-react";
-import { signInWithPopup, GoogleAuthProvider, User } from "firebase/auth";
+import { signInWithPopup, GoogleAuthProvider, User, onAuthStateChanged } from "firebase/auth";
 import { auth } from '../../services/firebase';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from 'next/router';
 
 export function Signin(){
     const [user, setUser] = useState<User>({} as User);
     const router = useRouter();
+
+    useEffect(() => {
+        const savedUser = localStorage.getItem("user");
+        if (savedUser) {
+            setUser(JSON.parse(savedUser));
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUser(user);
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem("user", JSON.stringify(user));
+    }, [user]);
 
     function signInWithGoogle() {
         const provider = new GoogleAuthProvider();
