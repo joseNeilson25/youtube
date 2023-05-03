@@ -4,6 +4,7 @@ import { listAll, ref, getDownloadURL, uploadBytesResumable } from "firebase/sto
 
 export default function Profile() {
   const [imgURLs, setImgURLs] = useState<string[]>([]);
+  const [videoURLs, setVideoURLs] = useState<string[]>([]);
   const [imgURL, setImgURL] = useState("");
   const [progressPorcent, setPorgessPorcent] = useState(0);
 
@@ -28,11 +29,16 @@ export default function Profile() {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImgURL(downloadURL);
+          if (file.type.includes('video/')) {
+            setVideoURLs((prevUrls) => [...prevUrls, downloadURL]);
+          } else {
+            setImgURL(downloadURL);
+          }
         });
       }
     );
   };
+  
   useEffect(() => {
     const storageRef = ref(storage, "images/");
     listAll(storageRef)
@@ -40,7 +46,10 @@ export default function Profile() {
         const promises = res.items.map((itemRef) => getDownloadURL(itemRef));
         Promise.all(promises)
           .then((downloadURLs) => {
-            setImgURLs(downloadURLs);
+            const imgUrls = downloadURLs.filter(url => !url.includes('.mp4'));
+            const videoUrls = downloadURLs.filter(url => url.includes('.mp4'));
+            setImgURLs(imgUrls);
+            setVideoURLs(videoUrls);
           })
           .catch((error) => {
             console.log(error);
@@ -55,17 +64,20 @@ export default function Profile() {
     <div className="App">
       <header className="App-header">
         {imgURLs.map((imgURL) => (
-          <img src={imgURL} alt="Imagem" height={200} />
+          <img key={imgURL} src={imgURL} alt="Imagem" height={200} />
         ))}
       </header>
       <header className="App-header">
-          <form onSubmit={handleSubmit}>
-            <input type="file" />
-            <button>Enviar</button>
-          </form>
-          {!imgURL && <p>{progressPorcent}%</p>}
-          {imgURL && <img src={imgURL} alt="Imagem" height={200} />}
-        </header>
+        {videoURLs.map((videoURL) => (
+          <video key={videoURL} src={videoURL} height={200} controls />
+        ))}
+        <form onSubmit={handleSubmit}>
+          <input type="file" />
+          <button>Enviar</button>
+        </form>
+        {!imgURL && <p>{progressPorcent}%</p>}
+        {imgURL && <img src={imgURL} alt="Imagem" height={200} />}
+      </header>
     </div>
   );
 }
