@@ -31,6 +31,7 @@ export default function Profile() {
           if (file.type.includes('video/')) {
             setVideoURLs((prevUrls) => [...prevUrls, downloadURL]);
           } else {
+            console.log(Error)
           }
         });
       }
