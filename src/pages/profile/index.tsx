@@ -5,7 +5,6 @@ import { listAll, ref, getDownloadURL, uploadBytesResumable } from "firebase/sto
 export default function Profile() {
   const [imgURLs, setImgURLs] = useState<string[]>([]);
   const [videoURLs, setVideoURLs] = useState<string[]>([]);
-  const [imgURL, setImgURL] = useState("");
   const [progressPorcent, setPorgessPorcent] = useState(0);
 
   const handleSubmit = (event: any) => {
@@ -32,7 +31,6 @@ export default function Profile() {
           if (file.type.includes('video/')) {
             setVideoURLs((prevUrls) => [...prevUrls, downloadURL]);
           } else {
-            setImgURL(downloadURL);
           }
         });
       }
@@ -75,8 +73,7 @@ export default function Profile() {
           <input type="file" />
           <button>Enviar</button>
         </form>
-        {!imgURL && <p>{progressPorcent}%</p>}
-        {imgURL && <img src={imgURL} alt="Imagem" height={200} />}
+        {!imgURLs && <p>{progressPorcent}%</p>}
       </header>
     </div>
   );
